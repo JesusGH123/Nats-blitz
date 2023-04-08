@@ -1,11 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Text;
 using NATS.Client;
 
 public class PlayerController : MonoBehaviour
 {
-
-    private string playerId;
 
     public float moveSpeed = 5f, runSpeed = 8f;
     private float activeMoveSpeed;
@@ -16,13 +15,95 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     public LayerMask groundLayers;
 
+    private int myPlayerId;
+
+    private static IDictionary<string, GameObject> playersMap;
+
+
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
+        myPlayerId = Random.Range(1, 100);
+        //Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
 
+        if (playersMap == null)
+        {
+            playersMap = new Dictionary<string, GameObject>();
 
-        Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) => {});
-        InvokeRepeating("PublishPlayerData", 1.0f, 0.1f);
+            Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) => {
+                //Parse and search for the session Id
+                string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
+                string[] playerId = payload.Split(':');
+                string id = playerId[0];
+
+                if (!playersMap.ContainsKey(id))
+                {
+                    string[] coords;
+                    coords = playerId[1].Split(',');
+
+                    if (myPlayerId.ToString() != id)
+                    {
+                        Log("Creating object");
+
+                        try
+                        {
+                            GameObject result = Instantiate(Launcher.instance.playerPrefab, new Vector3(
+                                float.Parse(coords[0]),
+                                float.Parse(coords[1]),
+                                float.Parse(coords[2])),
+                                Quaternion.identity);
+                            try
+                            {
+                                playersMap.Add(id, result);
+                                Log("Added + " + id);
+                            }
+                            catch (System.Exception ex)
+                            {
+                                Log(ex.Message.ToString());
+                                Log("Adding error");
+                            }
+                        }
+                        catch
+                        {
+                            Log("----------- There was an exception ---------------- ");
+                        }
+                    }
+                    else
+                    {
+                        Log("NOT creating object");
+                    }
+                }
+                else
+                {
+                    Log("Player contain key");
+                    string[] coords = playerId[1].Split(','); ;
+                    GameObject remotePlayer;
+
+                    try
+                    {
+                        playersMap.TryGetValue(id, out remotePlayer);
+
+                        if (id != myPlayerId.ToString()) {
+                            Log("x: " + float.Parse(coords[0]) +
+                                "y: " + float.Parse(coords[1]) +
+                                "z: " + float.Parse(coords[2]));
+                            remotePlayer.transform.position = new Vector3(
+                                    float.Parse(coords[0]),
+                                    float.Parse(coords[1]),
+                                    float.Parse(coords[2])
+                            );
+                        }
+                    }
+                    catch(System.Exception ex)
+                    {
+                        Log("----------- There was an exception 2 ---------------- " + ex.Message);
+                    }
+                }
+            });
+
+            InvokeRepeating("PublishPlayerData", 1.0f, 1/60f);
+        }
+        else
+            Log("Making the map again");
     }
 
     void Update()
@@ -50,15 +131,19 @@ public class PlayerController : MonoBehaviour
 
         movement.y += Physics.gravity.y * Time.deltaTime * gravityMod;
         charCon.Move(movement * Time.deltaTime);
-
     }
 
     void PublishPlayerData()
     {
-        string message = playerId + "," + transform.position.x + "," + transform.position.y + "," + transform.position.z;
+        string message = myPlayerId + ":" + transform.position.x + "," + transform.position.y + "," + transform.position.z;
         byte[] payload = System.Text.Encoding.Default.GetBytes(message);
 
-        // Publish message to NATS server
-        Launcher.instance.connection.Publish("blitz.playerPos." + GetInstanceID(), payload);
+        // Publish message to NATS server (payload is the message)
+        Launcher.instance.connection.Publish("blitz.playerPos", payload);
+    }
+
+    void Log(string message)
+    {
+        Launcher.instance.connection.Publish("blitz.Log." + myPlayerId.ToString(), System.Text.Encoding.Default.GetBytes(message));
     }
 }
