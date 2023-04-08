@@ -4,11 +4,8 @@ using NATS.Client;
 
 public class PlayerController : MonoBehaviour
 {
-    public const string PLAYERPOS = "blitz.playerPosition";
-    public const string PLAYERROT = "blitz.playerRotation";
 
-    private float updateTime = 0.1f;
-    private float timer;
+    private string playerId;
 
     public float moveSpeed = 5f, runSpeed = 8f;
     private float activeMoveSpeed;
@@ -19,25 +16,13 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     public LayerMask groundLayers;
 
-    [System.Serializable]
-    private class PositionData
-    {
-        public Vector3 position;
-    }
-
-    [System.Serializable]
-    private class RotationData
-    {
-        public Quaternion rotation;
-    }
-
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
 
-        NetworkManagerController.instance.connection.SubscribeAsync(PLAYERPOS, OnPositionMessage);
-        NetworkManagerController.instance.connection.Publish(PLAYERPOS, Encoding.UTF8.GetBytes("Player pos captured"));
-        NetworkManagerController.instance.connection.SubscribeAsync(PLAYERROT, OnRotationMessage);
+
+        Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) => {});
+        InvokeRepeating("PublishPlayerData", 1.0f, 0.1f);
     }
 
     void Update()
@@ -66,45 +51,14 @@ public class PlayerController : MonoBehaviour
         movement.y += Physics.gravity.y * Time.deltaTime * gravityMod;
         charCon.Move(movement * Time.deltaTime);
 
-        //Network behaviour
-        timer += Time.deltaTime;
-
-        if (timer >= updateTime)
-        {
-            Debug.Log("Message sent");
-            timer = 0;
-            SendRotationUpdate();
-            SendPositionUpdate();
-        }
-
     }
 
-    private void SendPositionUpdate()
+    void PublishPlayerData()
     {
-        string positionData = JsonUtility.ToJson(new PositionData
-        {
-            position = this.GetComponent<Transform>().position
-        });
-        byte[] data = Encoding.UTF8.GetBytes(positionData);
-        NetworkManagerController.instance.connection.Publish(PLAYERPOS, data);
-    }
-    private void SendRotationUpdate()
-    {
-        string rotationData = JsonUtility.ToJson(new RotationData
-        {
-            rotation = this.GetComponent<Transform>().rotation
-        });
-        byte[] data = Encoding.UTF8.GetBytes(rotationData);
-        NetworkManagerController.instance.connection.Publish(PLAYERROT, data);
-    }
+        string message = playerId + "," + transform.position.x + "," + transform.position.y + "," + transform.position.z;
+        byte[] payload = System.Text.Encoding.Default.GetBytes(message);
 
-    private void OnPositionMessage(object sender, MsgHandlerEventArgs args)
-    {
-        Debug.Log("A position message arrived!");
-    }
-
-    private void OnRotationMessage(object sender, MsgHandlerEventArgs args)
-    {
-        Debug.Log("A rotatiom message arrived!");
+        // Publish message to NATS server
+        Launcher.instance.connection.Publish("blitz.playerPos." + GetInstanceID(), payload);
     }
 }
