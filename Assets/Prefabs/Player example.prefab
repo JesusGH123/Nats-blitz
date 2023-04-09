@@ -203,6 +203,8 @@ MonoBehaviour:
   groundLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  playerCam: {fileID: 9037303011125702068}
+  mouseSensivity: 1
 --- !u!143 &7976366902917584642
 CharacterController:
   m_ObjectHideFlags: 0

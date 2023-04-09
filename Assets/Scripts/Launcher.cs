@@ -28,6 +28,7 @@ public class Launcher : MonoBehaviour
         Options opt = ConnectionFactory.GetDefaultOptions();
         opt.Url = "nats://demo.nats.io:4222";
         opt.Name = "Nats Blitz";
+        //opt.NoEcho = true;
 
         ConnectionFactory cf = new ConnectionFactory();
         connection = cf.CreateConnection(opt);
