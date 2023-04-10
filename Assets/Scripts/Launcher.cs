@@ -42,10 +42,5 @@ public class Launcher : MonoBehaviour
             connection.Publish("blitz.playerConnected", Encoding.UTF8.GetBytes("Game connected!"));
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
 }
 

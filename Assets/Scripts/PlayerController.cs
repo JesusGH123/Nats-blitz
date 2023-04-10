@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        
+
         Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
         myPlayerId = Random.Range(1, 100);
         if (playersMap == null)
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
                         Quaternion.identity);
 
                         playersMap.Add(id, result);
-                            
+
                     }
                     else
                         isMine = true;
@@ -70,7 +70,8 @@ public class PlayerController : MonoBehaviour
                     playersMap.TryGetValue(id, out remotePlayer);
 
                     //We have registered the key and it is not our player
-                    if (myPlayerId.ToString() != id) {
+                    if (myPlayerId.ToString() != id)
+                    {
                         isMine = false;
 
                         remotePlayer.transform.position = new Vector3(
@@ -78,7 +79,8 @@ public class PlayerController : MonoBehaviour
                                 float.Parse(coords[1]),
                                 float.Parse(coords[2])
                         );
-                    } else
+                    }
+                    else
                     {
                         isMine = true;
                     }
@@ -86,7 +88,7 @@ public class PlayerController : MonoBehaviour
                 }
             });
 
-            InvokeRepeating("PublishPlayerData", 1.0f, 1/60f);
+            InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
         }
     }
 
@@ -94,7 +96,8 @@ public class PlayerController : MonoBehaviour
     {
         //Local behaviour
         //Player movement
-        if (isMine) {
+        if (isMine)
+        {
             moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
             activeMoveSpeed = (Input.GetKey(KeyCode.LeftShift)) ? runSpeed : moveSpeed;
 
