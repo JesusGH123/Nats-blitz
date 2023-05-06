@@ -314,6 +314,12 @@ MonoBehaviour:
     m_Bits: 4294967295
   playerCam: {fileID: 0}
   mouseSensivity: 1
+  playerColors:
+  - {fileID: 2100000, guid: ba0d05610c707ae4fbd333c305486898, type: 2}
+  - {fileID: 2100000, guid: d293afa01e2457045a4e464e85f66ecf, type: 2}
+  - {fileID: 2100000, guid: c2c955830ccf11b4795dae25988604c3, type: 2}
+  - {fileID: 2100000, guid: f7d5487ad6992dd4b91b3fb24672a687, type: 2}
+  - {fileID: 2100000, guid: 6ffd9fa12d5e2c04289f5d1786232b2a, type: 2}
 --- !u!143 &7976366902917584642
 CharacterController:
   m_ObjectHideFlags: 0

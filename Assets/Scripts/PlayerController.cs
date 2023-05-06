@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Text;
-using NATS.Client;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,23 +14,28 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayers;
     public Camera playerCam;
     private Vector2 mouseInput;
-    private int myPlayerId;
+    private string myPlayerId;
     public float mouseSensivity = 1f;
 
     string id;
     bool isMine;
 
     private static IDictionary<string, GameObject> playersMap;
-
+    public List<Material> playerColors;
 
     void Start()
     {
+        Launcher.instance.nameInputScreen.SetActive(false);
+
+        //Set player color
+        this.GetComponent<MeshRenderer>().material = playerColors[UnityEngine.Random.Range(0, playerColors.Count)];
+        this.transform.Find("Backpack").GetComponent<MeshRenderer>().material = this.GetComponent<MeshRenderer>().material;
 
         Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
-        myPlayerId = Random.Range(1, 100);
         if (playersMap == null)
         {
             playersMap = new Dictionary<string, GameObject>();
+            myPlayerId = Launcher.instance.playerName.text;
 
             Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) => {
                 //Parse and search for the session Id
@@ -40,13 +43,14 @@ public class PlayerController : MonoBehaviour
                 string[] playerId = payload.Split(':');
                 id = playerId[0];
 
+                string[] coords;
                 if (!playersMap.ContainsKey(id))
                 {
-                    string[] coords;
                     coords = playerId[1].Split(',');
 
                     //We do not have a key and the other player is not spawned yet
-                    if (myPlayerId.ToString() != id)
+                    Log("myPlayerId: " + myPlayerId + " == " + " id: " + id + " == " + (myPlayerId == id).ToString());
+                    if (myPlayerId != id)
                     {
                         isMine = false;
 
@@ -57,20 +61,20 @@ public class PlayerController : MonoBehaviour
                         Quaternion.identity);
 
                         playersMap.Add(id, result);
-
                     }
                     else
                         isMine = true;
                 }
+
                 else
                 {
-                    string[] coords = playerId[1].Split(','); ;
+                    coords = playerId[1].Split(','); ;
                     GameObject remotePlayer;
 
                     playersMap.TryGetValue(id, out remotePlayer);
 
                     //We have registered the key and it is not our player
-                    if (myPlayerId.ToString() != id)
+                    if (id != myPlayerId)
                     {
                         isMine = false;
 
@@ -81,10 +85,7 @@ public class PlayerController : MonoBehaviour
                         );
                     }
                     else
-                    {
                         isMine = true;
-                    }
-
                 }
             });
 
@@ -150,6 +151,6 @@ public class PlayerController : MonoBehaviour
 
     void Log(string message)
     {
-        Launcher.instance.connection.Publish("blitz.Log." + myPlayerId.ToString(), System.Text.Encoding.Default.GetBytes(message));
+        Launcher.instance.connection.Publish("blitz.Log." + myPlayerId, System.Text.Encoding.Default.GetBytes(message));
     }
 }

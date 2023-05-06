@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using System.Text;
 using NATS.Client;
@@ -11,19 +12,21 @@ public class Launcher : MonoBehaviour
     public GameObject playerPrefab;
     public Transform playerSpawn;
 
-    private string playerId;
-
-    public string getPlayerId()
-    {
-        return playerId;
-    }
+    public GameObject nameInputScreen;
+    public TMP_InputField playerName;
 
     private void Awake()
     {
         instance = this;
+        Cursor.lockState = CursorLockMode.Confined;   //Cursor dissapears when the game starts
     }
 
     void Start()
+    {
+        
+    }
+
+    public void Connect()
     {
         Options opt = ConnectionFactory.GetDefaultOptions();
         opt.Url = "nats://demo.nats.io:4222";
@@ -43,4 +46,3 @@ public class Launcher : MonoBehaviour
         }
     }
 }
-
