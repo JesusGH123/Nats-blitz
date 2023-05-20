@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NATS.Client;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,96 +15,61 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayers;
     public Camera playerCam;
     private Vector2 mouseInput;
-    private string myPlayerId;
+
+    public string myPlayerId;
+    private string[] playerId;
+
     public float mouseSensivity = 1f;
 
     string id;
-    bool isMine;
+    string[] coords;
 
     private static IDictionary<string, GameObject> playersMap;
     public List<Material> playerColors;
+    private List<string> spawnedPlayers;
 
+    private void Awake()
+    {
+        Destroy(this.GetComponent<Rigidbody>());
+    }
     void Start()
     {
+
         Launcher.instance.nameInputScreen.SetActive(false);
 
-        //Set player color
+        //Set player random color
         this.GetComponent<MeshRenderer>().material = playerColors[UnityEngine.Random.Range(0, playerColors.Count)];
         this.transform.Find("Backpack").GetComponent<MeshRenderer>().material = this.GetComponent<MeshRenderer>().material;
 
         Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
-        if (playersMap == null)
+        playersMap = new Dictionary<string, GameObject>();
+        myPlayerId = Launcher.instance.playerName.text;
+
+        Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
         {
-            playersMap = new Dictionary<string, GameObject>();
-            myPlayerId = Launcher.instance.playerName.text;
+            //Parse and search for the session Id
+            string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
+            playerId = payload.Split(':');
+            id = playerId[0];
+            coords = playerId[1].Split(',');
 
-            Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) => {
-                //Parse and search for the session Id
-                string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
-                string[] playerId = payload.Split(':');
-                id = playerId[0];
+            Log("Player map contains id: " + playersMap.ContainsKey(id));
+            Log("id: " + id);
+        });
 
-                string[] coords;
-                if (!playersMap.ContainsKey(id))
-                {
-                    coords = playerId[1].Split(',');
+        InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
 
-                    //We do not have a key and the other player is not spawned yet
-                    Log("myPlayerId: " + myPlayerId + " == " + " id: " + id + " == " + (myPlayerId == id).ToString());
-                    if (myPlayerId != id)
-                    {
-                        isMine = false;
-
-                        GameObject result = Instantiate(Launcher.instance.playerPrefab, new Vector3(
-                        float.Parse(coords[0]),
-                        float.Parse(coords[1]),
-                        float.Parse(coords[2])),
-                        Quaternion.identity);
-
-                        playersMap.Add(id, result);
-                    }
-                    else
-                        isMine = true;
-                }
-
-                else
-                {
-                    coords = playerId[1].Split(','); ;
-                    GameObject remotePlayer;
-
-                    playersMap.TryGetValue(id, out remotePlayer);
-
-                    //We have registered the key and it is not our player
-                    if (id != myPlayerId)
-                    {
-                        isMine = false;
-
-                        remotePlayer.transform.position = new Vector3(
-                                float.Parse(coords[0]),
-                                float.Parse(coords[1]),
-                                float.Parse(coords[2])
-                        );
-                    }
-                    else
-                        isMine = true;
-                }
-            });
-
-            InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
-        }
     }
 
     void Update()
     {
-        //Local behaviour
-        //Player movement
-        if (isMine)
+        if (this.gameObject == Launcher.instance.myPlayer)
         {
             moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
             activeMoveSpeed = (Input.GetKey(KeyCode.LeftShift)) ? runSpeed : moveSpeed;
 
             float yVel = movement.y;
-            movement = ((transform.forward * moveDir.z) + (transform.right * moveDir.x)).normalized * activeMoveSpeed;
+            movement = ((-transform.forward * moveDir.z) + (-transform.right * moveDir.x)).normalized * activeMoveSpeed;
             movement.y = yVel;
 
             if (charCon.isGrounded)
@@ -117,15 +83,39 @@ public class PlayerController : MonoBehaviour
             {
                 movement.y = jumpForce;
             }
-
             movement.y += Physics.gravity.y * Time.deltaTime * gravityMod;
             charCon.Move(movement * Time.deltaTime);
 
             //Camera behaviour
-            mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensivity;
+            //mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensivity;
 
-            verticalRotStore -= Mathf.Clamp(mouseInput.y, -60f, 60f);
-            playerCam.transform.rotation = Quaternion.Euler(verticalRotStore, playerCam.transform.rotation.eulerAngles.y + mouseInput.x, playerCam.transform.rotation.eulerAngles.z); //Look up/down
+            //verticalRotStore -= Mathf.Clamp(mouseInput.y, -60f, 60f);
+            //playerCam.transform.rotation = Quaternion.Euler(verticalRotStore, playerCam.transform.rotation.eulerAngles.y + mouseInput.x, playerCam.transform.rotation.eulerAngles.z); //Look up/down
+
+        }
+
+        if (!playersMap.ContainsKey(id))
+        {
+            GameObject newPlayer = Instantiate(
+                Launcher.instance.playerPrefab,
+                new Vector3(
+                    float.Parse(coords[0]),
+                    float.Parse(coords[1]),
+                    float.Parse(coords[2])),
+                Quaternion.identity
+            );
+            playersMap.Add(id, newPlayer);
+        }
+        else
+        {
+            GameObject remotePlayer;
+            playersMap.TryGetValue(id, out remotePlayer);
+
+            remotePlayer.transform.position = new Vector3(
+                    float.Parse(coords[0]),
+                    float.Parse(coords[1]),
+                    float.Parse(coords[2])
+            );
         }
 
         //Cursor behaviour

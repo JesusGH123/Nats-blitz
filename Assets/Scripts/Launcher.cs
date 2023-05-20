@@ -15,6 +15,8 @@ public class Launcher : MonoBehaviour
     public GameObject nameInputScreen;
     public TMP_InputField playerName;
 
+    public GameObject myPlayer;
+
     private void Awake()
     {
         instance = this;
@@ -23,7 +25,7 @@ public class Launcher : MonoBehaviour
 
     void Start()
     {
-        
+       
     }
 
     public void Connect()
@@ -35,14 +37,11 @@ public class Launcher : MonoBehaviour
 
         ConnectionFactory cf = new ConnectionFactory();
         connection = cf.CreateConnection(opt);
-        connection.SubscribeAsync("blitz.playerConnected", (sender, args) => {
-            Instantiate(playerPrefab, playerSpawn.position, Quaternion.identity);
-        });
 
         //If the connection was successful spawn a player
         if (connection.ConnectedId != null)
         {
-            connection.Publish("blitz.playerConnected", Encoding.UTF8.GetBytes("Game connected!"));
+            myPlayer = Instantiate(playerPrefab, playerSpawn.position, Quaternion.identity);
         }
     }
 }
