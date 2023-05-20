@@ -125,7 +125,8 @@ public class PlayerController : MonoBehaviour
 
     void RemotePlayers(string id)
     {
-        if (playersMap.TryGetValue(id, out remotePlayer) == false)
+        playersMap.TryGetValue(id, out remotePlayer);
+        if (remotePlayer == null)
         {
             remotePlayer = Instantiate(
                 Launcher.instance.playerPrefab,
