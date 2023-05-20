@@ -21,12 +21,13 @@ public class PlayerController : MonoBehaviour
 
     public float mouseSensivity = 1f;
 
-    string id;
     string[] coords;
 
     private static IDictionary<string, GameObject> playersMap;
     public List<Material> playerColors;
     private List<string> spawnedPlayers;
+
+    GameObject remotePlayer;
 
     private void Awake()
     {
@@ -42,20 +43,23 @@ public class PlayerController : MonoBehaviour
         this.transform.Find("Backpack").GetComponent<MeshRenderer>().material = this.GetComponent<MeshRenderer>().material;
 
         Cursor.lockState = CursorLockMode.Locked;   //Cursor dissapears when the game starts
-        playersMap = new Dictionary<string, GameObject>();
-        myPlayerId = Launcher.instance.playerName.text;
-
-        Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
+        if (playersMap == null)
         {
+            playersMap = new Dictionary<string, GameObject>();
+            myPlayerId = Launcher.instance.playerName.text;
+
+            string id;
+            Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
+            {
             //Parse and search for the session Id
             string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
-            playerId = payload.Split(':');
-            id = playerId[0];
-            coords = playerId[1].Split(',');
+                playerId = payload.Split(':');
+                id = playerId[0];
+                coords = playerId[1].Split(',');
 
-            Log("Player map contains id: " + playersMap.ContainsKey(id));
-            Log("id: " + id);
-        });
+                RemotePlayers(id);
+            });
+        }
 
         InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
 
@@ -91,31 +95,6 @@ public class PlayerController : MonoBehaviour
 
             //verticalRotStore -= Mathf.Clamp(mouseInput.y, -60f, 60f);
             //playerCam.transform.rotation = Quaternion.Euler(verticalRotStore, playerCam.transform.rotation.eulerAngles.y + mouseInput.x, playerCam.transform.rotation.eulerAngles.z); //Look up/down
-
-        }
-
-        if (!playersMap.ContainsKey(id))
-        {
-            GameObject newPlayer = Instantiate(
-                Launcher.instance.playerPrefab,
-                new Vector3(
-                    float.Parse(coords[0]),
-                    float.Parse(coords[1]),
-                    float.Parse(coords[2])),
-                Quaternion.identity
-            );
-            playersMap.Add(id, newPlayer);
-        }
-        else
-        {
-            GameObject remotePlayer;
-            playersMap.TryGetValue(id, out remotePlayer);
-
-            remotePlayer.transform.position = new Vector3(
-                    float.Parse(coords[0]),
-                    float.Parse(coords[1]),
-                    float.Parse(coords[2])
-            );
         }
 
         //Cursor behaviour
@@ -142,5 +121,29 @@ public class PlayerController : MonoBehaviour
     void Log(string message)
     {
         Launcher.instance.connection.Publish("blitz.Log." + myPlayerId, System.Text.Encoding.Default.GetBytes(message));
+    }
+
+    void RemotePlayers(string id)
+    {
+        if (playersMap.TryGetValue(id, out remotePlayer) == false)
+        {
+            remotePlayer = Instantiate(
+                Launcher.instance.playerPrefab,
+                new Vector3(
+                    float.Parse(coords[0]),
+                    float.Parse(coords[1]),
+                    float.Parse(coords[2])),
+                Quaternion.identity
+            );
+            playersMap.Add(id, remotePlayer);
+        }
+        else
+        {
+            remotePlayer.transform.position = new Vector3(
+                    float.Parse(coords[0]),
+                    float.Parse(coords[1]),
+                    float.Parse(coords[2])
+            );
+        }
     }
 }
