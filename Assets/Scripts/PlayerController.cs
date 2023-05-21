@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
         if (playersMap == null)
         {
             playersMap = new Dictionary<string, GameObject>();
-
+            myPlayerId = Launcher.instance.playerName.text;
             string id;
             Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
             {
