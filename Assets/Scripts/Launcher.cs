@@ -23,11 +23,6 @@ public class Launcher : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;   //Cursor dissapears when the game starts
     }
 
-    void Start()
-    {
-       
-    }
-
     public void Connect()
     {
         Options opt = ConnectionFactory.GetDefaultOptions();
