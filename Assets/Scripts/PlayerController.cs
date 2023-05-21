@@ -146,5 +146,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    
+    private void OnApplicationQuit()
+    {
+        Launcher.instance.connection.Close();
+        Destroy(this);
+    }
+
 }
