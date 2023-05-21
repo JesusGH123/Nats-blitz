@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviour
     }
     void Start()
     {
-
         Launcher.instance.nameInputScreen.SetActive(false);
 
         //Set player random color
@@ -46,23 +45,21 @@ public class PlayerController : MonoBehaviour
         if (playersMap == null)
         {
             playersMap = new Dictionary<string, GameObject>();
-            myPlayerId = Launcher.instance.playerName.text;
 
             string id;
             Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
             {
             //Parse and search for the session Id
             string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
+                Log("Payload: " + payload);
                 playerId = payload.Split(':');
                 id = playerId[0];
                 coords = playerId[1].Split(',');
 
-                RemotePlayers(id);
+                RemotePlayersUpdate(id);
             });
+            InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
         }
-
-        InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
-
     }
 
     void Update()
@@ -123,7 +120,7 @@ public class PlayerController : MonoBehaviour
         Launcher.instance.connection.Publish("blitz.Log." + myPlayerId, System.Text.Encoding.Default.GetBytes(message));
     }
 
-    void RemotePlayers(string id)
+    void RemotePlayersUpdate(string id)
     {
         playersMap.TryGetValue(id, out remotePlayer);
         if (remotePlayer == null)
@@ -140,11 +137,14 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            remotePlayer.transform.position = new Vector3(
+            remotePlayer.transform.position =
+                new Vector3(
                     float.Parse(coords[0]),
                     float.Parse(coords[1]),
                     float.Parse(coords[2])
-            );
+                    );
         }
     }
+
+    
 }
