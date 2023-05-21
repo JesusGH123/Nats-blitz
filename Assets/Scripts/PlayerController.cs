@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour
 
     private static IDictionary<string, GameObject> playersMap;
     public List<Material> playerColors;
-    private List<string> spawnedPlayers;
 
     GameObject remotePlayer;
 
@@ -50,7 +49,6 @@ public class PlayerController : MonoBehaviour
             {
             //Parse and search for the session Id
             string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
-                Log("Payload: " + payload);
                 playerId = payload.Split(':');
                 id = playerId[0];
                 coords = playerId[1].Split(',');
@@ -58,6 +56,12 @@ public class PlayerController : MonoBehaviour
                 RemotePlayersUpdate(id);
             });
             InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
+
+            Launcher.instance.connection.SubscribeAsync("blitz.playerRemove", (sender, args) =>
+            {
+                Log(System.Text.Encoding.UTF8.GetString(args.Message.Data));
+                DestroyRemotePlayer(System.Text.Encoding.UTF8.GetString(args.Message.Data));
+            });
         }
     }
 
@@ -145,8 +149,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void DestroyRemotePlayer(string playerId)
+    {
+        playersMap.TryGetValue(playerId, out remotePlayer);
+        if(remotePlayer != null)
+        {
+            Destroy(remotePlayer);
+        }
+        playersMap.Remove(playerId);
+    }
+
     private void OnApplicationQuit()
     {
+        //Destroy me on remote players
+        Launcher.instance.connection.Publish(
+            "blitz.playerRemove",
+            System.Text.Encoding.Default.GetBytes(myPlayerId)    
+        );
+        //Destroy local player
         Launcher.instance.connection.Close();
         Destroy(this);
     }
