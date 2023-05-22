@@ -109,6 +109,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.transform.CompareTag("Player"))
+        {
+            DestroyMe();
+        }
+    }
+
     void PublishPlayerData()
     {
         string message = myPlayerId + ":" + transform.position.x + "," + transform.position.y + "," + transform.position.z;
@@ -159,16 +167,21 @@ public class PlayerController : MonoBehaviour
         playersMap.Remove(playerId);
     }
 
-    private void OnApplicationQuit()
+    private void DestroyMe()
     {
         //Destroy me on remote players
         Launcher.instance.connection.Publish(
             "blitz.playerRemove",
-            System.Text.Encoding.Default.GetBytes(myPlayerId)    
+            System.Text.Encoding.Default.GetBytes(myPlayerId)
         );
         //Destroy local player
         Launcher.instance.connection.Close();
         Destroy(this);
+    }
+
+    private void OnApplicationQuit()
+    {
+        DestroyMe();
     }
 
 }
