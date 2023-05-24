@@ -92,8 +92,7 @@ public class PlayerController : MonoBehaviour
 
             if (isGrounded && hit.collider.gameObject.CompareTag("Player"))
             {
-                //Log("Aplastando a: " + hit.collider.gameObject.GetComponent<PlayerController>().myPlayerId);
-                //DestroyRemotePlayer(hit.collider.gameObject.GetComponent<PlayerController>().myPlayerId);
+                //TODO: Player interaction
             }
 
             movement.y += Physics.gravity.y * Time.deltaTime * gravityMod;
