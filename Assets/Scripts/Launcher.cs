@@ -29,7 +29,7 @@ public class Launcher : MonoBehaviour
     {
         Options opt = ConnectionFactory.GetDefaultOptions();
 
-        if(serverUrl.text == null || serverUrl.text = "")
+        if(serverUrl.text == null || serverUrl.text == "")
         {
             opt.Url = defaultUrl;
         } else

@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
     private Vector2 mouseInput;
 
     public string myPlayerId;
-    private string[] playerId;
 
     public float mouseSensivity = 1f;
 
@@ -48,10 +47,12 @@ public class PlayerController : MonoBehaviour
             playersMap = new Dictionary<string, GameObject>();
             myPlayerId = Launcher.instance.playerName.text;
             string id;
+
             playerSub = Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
             {
-            //Parse and search for the session Id
-            string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
+                string[] playerId;   
+                //Parse and search for the session Id
+                string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
                 playerId = payload.Split(':');
                 id = playerId[0];
 
