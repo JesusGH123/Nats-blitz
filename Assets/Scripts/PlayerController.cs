@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NATS.Client;
 
 public class PlayerController : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private RaycastHit hit;
 
     GameObject remotePlayer;
+    IAsyncSubscription playerSub, removePlayerSub;
 
     private void Awake()
     {
@@ -46,7 +48,7 @@ public class PlayerController : MonoBehaviour
             playersMap = new Dictionary<string, GameObject>();
             myPlayerId = Launcher.instance.playerName.text;
             string id;
-            Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
+            playerSub = Launcher.instance.connection.SubscribeAsync("blitz.playerPos", (sender, args) =>
             {
             //Parse and search for the session Id
             string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
@@ -57,7 +59,7 @@ public class PlayerController : MonoBehaviour
             });
             InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
 
-            Launcher.instance.connection.SubscribeAsync("blitz.playerRemove", (sender, args) =>
+            removePlayerSub = Launcher.instance.connection.SubscribeAsync("blitz.playerRemove", (sender, args) =>
             {
                 DestroyRemotePlayer(System.Text.Encoding.UTF8.GetString(args.Message.Data));
             });
@@ -95,12 +97,6 @@ public class PlayerController : MonoBehaviour
 
             movement.y += Physics.gravity.y * Time.deltaTime * gravityMod;
             charCon.Move(movement * Time.deltaTime);
-
-            //Camera behaviour
-            //mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensivity;
-
-            //verticalRotStore -= Mathf.Clamp(mouseInput.y, -60f, 60f);
-            //playerCam.transform.rotation = Quaternion.Euler(verticalRotStore, playerCam.transform.rotation.eulerAngles.y + mouseInput.x, playerCam.transform.rotation.eulerAngles.z); //Look up/down
         }
 
         //Cursor behaviour
@@ -167,6 +163,10 @@ public class PlayerController : MonoBehaviour
 
     public void DestroyMe()
     {
+        //Unsubscribe suscriptions
+        playerSub.Unsubscribe();
+        removePlayerSub.Unsubscribe();
+
         //Destroy me on remote players
         Launcher.instance.connection.Publish(
             "blitz.playerRemove",
