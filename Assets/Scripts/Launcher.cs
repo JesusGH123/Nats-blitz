@@ -1,7 +1,7 @@
-using TMPro;
 using UnityEngine;
 using System.Text;
 using NATS.Client;
+using TMPro;
 
 //Class to make NATS connection
 public class Launcher : MonoBehaviour

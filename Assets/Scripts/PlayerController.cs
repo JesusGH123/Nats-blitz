@@ -20,10 +20,10 @@ public class PlayerController : MonoBehaviour
 
     public float mouseSensivity = 1f;
 
-    string[] coords;
-
     private static IDictionary<string, GameObject> playersMap;
     public List<Material> playerColors;
+
+    private RaycastHit hit;
 
     GameObject remotePlayer;
 
@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour
     {
         Destroy(this.GetComponent<Rigidbody>());
     }
+
     void Start()
     {
         Launcher.instance.nameInputScreen.SetActive(false);
@@ -51,15 +52,13 @@ public class PlayerController : MonoBehaviour
             string payload = System.Text.Encoding.UTF8.GetString(args.Message.Data);
                 playerId = payload.Split(':');
                 id = playerId[0];
-                coords = playerId[1].Split(',');
 
-                RemotePlayersUpdate(id);
+                RemotePlayersUpdate(id, playerId[1].Split(','));
             });
             InvokeRepeating("PublishPlayerData", 1.0f, 1 / 30f);
 
             Launcher.instance.connection.SubscribeAsync("blitz.playerRemove", (sender, args) =>
             {
-                Log(System.Text.Encoding.UTF8.GetString(args.Message.Data));
                 DestroyRemotePlayer(System.Text.Encoding.UTF8.GetString(args.Message.Data));
             });
         }
@@ -81,12 +80,19 @@ public class PlayerController : MonoBehaviour
                 movement.y = 0;
             }
 
-            isGrounded = Physics.Raycast(groundCheckPoint.position, Vector3.down, .25f, groundLayers);
+            isGrounded = Physics.Raycast(groundCheckPoint.position, Vector3.down, out hit, .25f, groundLayers);
 
             if (Input.GetButtonDown("Jump") && isGrounded)
             {
                 movement.y = jumpForce;
             }
+
+            if (isGrounded && hit.collider.gameObject.CompareTag("Player"))
+            {
+                //Log("Aplastando a: " + hit.collider.gameObject.GetComponent<PlayerController>().myPlayerId);
+                //DestroyRemotePlayer(hit.collider.gameObject.GetComponent<PlayerController>().myPlayerId);
+            }
+
             movement.y += Physics.gravity.y * Time.deltaTime * gravityMod;
             charCon.Move(movement * Time.deltaTime);
 
@@ -123,7 +129,7 @@ public class PlayerController : MonoBehaviour
         Launcher.instance.connection.Publish("blitz.Log." + myPlayerId, System.Text.Encoding.Default.GetBytes(message));
     }
 
-    void RemotePlayersUpdate(string id)
+    void RemotePlayersUpdate(string id, string[] coords)
     {
         playersMap.TryGetValue(id, out remotePlayer);
         if (remotePlayer == null)
@@ -159,7 +165,7 @@ public class PlayerController : MonoBehaviour
         playersMap.Remove(playerId);
     }
 
-    private void DestroyMe()
+    public void DestroyMe()
     {
         //Destroy me on remote players
         Launcher.instance.connection.Publish(
@@ -168,6 +174,7 @@ public class PlayerController : MonoBehaviour
         );
         //Destroy local player
         Launcher.instance.connection.Close();
+        Launcher.instance.connection.Flush();
         Destroy(this);
     }
 

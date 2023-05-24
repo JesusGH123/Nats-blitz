@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 887024183482873409}
   - component: {fileID: 8640641575562131263}
   - component: {fileID: 7520406784033072660}
-  - component: {fileID: 3036800374721239149}
   m_Layer: 0
   m_Name: Backpack
   m_TagString: Untagged
@@ -31,7 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 0.459954}
   m_Children: []
   m_Father: {fileID: 7976366902917584643}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8640641575562131263
 MeshFilter:
@@ -82,19 +81,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3036800374721239149
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4560859384368812723}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7115822334169698504
 GameObject:
   m_ObjectHideFlags: 0
@@ -107,9 +93,10 @@ GameObject:
   - component: {fileID: 6603306538681650275}
   - component: {fileID: 8291804704695360193}
   - component: {fileID: 3810226800862607037}
+  - component: {fileID: 6440707487020514905}
   m_Layer: 0
-  m_Name: Head Check Point
-  m_TagString: Untagged
+  m_Name: Ground Check Point
+  m_TagString: PlayerFeet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -122,11 +109,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7115822334169698504}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.00000093877316, y: 1.0000002, z: 0}
-  m_LocalScale: {x: 0.43406537, y: 0.0636, z: 0.38389793}
+  m_LocalPosition: {x: 0.01, y: -1.079, z: 0.01}
+  m_LocalScale: {x: 0.22010206, y: 0.0636, z: 0.23783676}
   m_Children: []
   m_Father: {fileID: 7976366902917584643}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6603306538681650275
 MeshFilter:
@@ -188,103 +175,20 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &7629798095956317404
-GameObject:
+  m_Size: {x: 2, y: 2.5600157, z: 2}
+  m_Center: {x: 0, y: -0.48677874, z: 0}
+--- !u!114 &6440707487020514905
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7513712417415950397}
-  - component: {fileID: 1944162133214081503}
-  - component: {fileID: 1147962171513929051}
-  - component: {fileID: 791695838646993122}
-  m_Layer: 0
-  m_Name: Ground Check Point
-  m_TagString: PlayerFeet
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7513712417415950397
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7629798095956317404}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.00000093877316, y: -0.9682, z: 0}
-  m_LocalScale: {x: 0.43406537, y: 0.0636, z: 0.38389793}
-  m_Children: []
-  m_Father: {fileID: 7976366902917584643}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &1944162133214081503
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7629798095956317404}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &1147962171513929051
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7629798095956317404}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &791695838646993122
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7629798095956317404}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_GameObject: {fileID: 7115822334169698504}
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fab0e3719e58c474098f240dd8708b28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7976366902917584655
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,7 +203,6 @@ GameObject:
   - component: {fileID: 7976366902917584654}
   - component: {fileID: 7976366902917584645}
   - component: {fileID: 7976366902917584642}
-  - component: {fileID: 710361012472724069}
   m_Layer: 0
   m_Name: Player example
   m_TagString: Player
@@ -318,7 +221,6 @@ Transform:
   m_LocalPosition: {x: -61, y: 8, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 7513712417415950397}
   - {fileID: 8203228308696669351}
   - {fileID: 887024183482873409}
   - {fileID: 8689077983804612729}
@@ -382,12 +284,12 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7976366902917584655}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5
-  m_Height: 2
+  m_Height: 1.1941843
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.7519927, z: 0}
 --- !u!114 &7976366902917584645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,7 +307,7 @@ MonoBehaviour:
   charCon: {fileID: 7976366902917584642}
   jumpForce: 12
   gravityMod: 2.5
-  groundCheckPoint: {fileID: 7513712417415950397}
+  groundCheckPoint: {fileID: 8689077983804612729}
   groundLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -436,22 +338,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &710361012472724069
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7976366902917584655}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 72
-  m_CollisionDetection: 0
 --- !u!1 &8165570867406300264
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,7 +349,6 @@ GameObject:
   - component: {fileID: 8203228308696669351}
   - component: {fileID: 6457982994125211310}
   - component: {fileID: 8540535229085353945}
-  - component: {fileID: 3026760310751033391}
   m_Layer: 0
   m_Name: View Point
   m_TagString: Untagged
@@ -483,7 +368,7 @@ Transform:
   m_LocalScale: {x: 0.646545, y: 0.2025689, z: 0.5648539}
   m_Children: []
   m_Father: {fileID: 7976366902917584643}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6457982994125211310
 MeshFilter:
@@ -534,16 +419,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3026760310751033391
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8165570867406300264}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}

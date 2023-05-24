@@ -869,7 +869,7 @@ GameObject:
   - component: {fileID: 888365401}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1445,6 +1445,7 @@ MonoBehaviour:
   playerSpawn: {fileID: 1807599271}
   nameInputScreen: {fileID: 1504314931}
   playerName: {fileID: 1261092075}
+  myPlayer: {fileID: 0}
 --- !u!4 &1562500059
 Transform:
   m_ObjectHideFlags: 0
