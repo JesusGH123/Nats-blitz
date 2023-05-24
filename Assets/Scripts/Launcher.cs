@@ -13,9 +13,11 @@ public class Launcher : MonoBehaviour
     public Transform playerSpawn;
 
     public GameObject nameInputScreen;
-    public TMP_InputField playerName;
+    public TMP_InputField playerName, serverUrl;
 
     public GameObject myPlayer;
+
+    private string defaultUrl = "nats://demo.nats.io:4222";
 
     private void Awake()
     {
@@ -26,7 +28,14 @@ public class Launcher : MonoBehaviour
     public void Connect()
     {
         Options opt = ConnectionFactory.GetDefaultOptions();
-        opt.Url = "nats://demo.nats.io:4222";
+
+        if(serverUrl.text == null || serverUrl.text = "")
+        {
+            opt.Url = defaultUrl;
+        } else
+        {
+            opt.Url = serverUrl.text;
+        }
         opt.Name = "Nats Blitz";
         opt.NoEcho = true;
 
